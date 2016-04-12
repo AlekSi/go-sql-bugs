@@ -1,5 +1,7 @@
 package bugs
 
+// https://github.com/golang/go/issues/15174
+
 import (
 	"database/sql"
 	"log"
