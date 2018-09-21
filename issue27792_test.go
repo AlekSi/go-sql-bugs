@@ -12,11 +12,9 @@ func TestStats(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err = db.Ping(); err != nil {
-		t.Fatal(err)
-	}
 	defer db.Close()
 
+	// use single database connection, never close it, always reuse
 	db.SetMaxOpenConns(1)
 	db.SetMaxIdleConns(1)
 	db.SetConnMaxLifetime(0)
@@ -24,13 +22,13 @@ func TestStats(t *testing.T) {
 	t.Logf("%+v", db.Stats())
 
 	for i := 0; i < 10; i++ {
-		if _, err = db.Exec("SELECT 1"); err != nil {
+		if _, err := db.Exec("SELECT 1"); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	t.Logf("%+v", db.Stats())
-	if db.Stats().MaxIdleClosed > 5 {
-		t.Errorf("expected MaxIdleClosed to be reasonable")
+	if db.Stats().MaxIdleClosed != 1 {
+		t.Errorf("unexpected MaxIdleClosed")
 	}
 }
